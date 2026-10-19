@@ -15,6 +15,7 @@ const adapter = new PrismaPg({
 const connectDB = async () =>{
     try {
         await prisma.$connect()
+        await prisma.$queryRaw`SELECT 1`;
         console.log("DB connected via prisma");
         
     } catch (error) {
@@ -25,6 +26,7 @@ const connectDB = async () =>{
 
 const disconnectDB = async () => {
     await prisma.$disconnect()
+    console.log("Database disconnected");
 }
 
 export {prisma,connectDB, disconnectDB} 

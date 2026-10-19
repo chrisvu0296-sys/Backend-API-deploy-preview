@@ -27,37 +27,70 @@ app.use('/auth', authRoutes)
 app.use('/watchlist', watchlistRoutes)
 
 
-const PORT = 3000
-const server = app.listen(PORT, () => {
-    console.log(`server is running on port ${PORT}`);
+const PORT = process.env.PORT || 3000;
+// const server = app.listen(PORT,"0.0.0.0", () => {
+//     console.log(`server is running on port ${PORT}`);
     
-})
+// })
+async function startServer() {
+  try {
+    await connectDB();
+
+    const server = app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+
+const shutdown = (signal) => {
+      console.log(`${signal} received; shutting down`);
+
+      server.close(async () => {
+        try {
+          await disconnectDB();
+          process.exit(0);
+        } catch (error) {
+          console.error("Database shutdown failed:", error);
+          process.exit(1);
+        }
+      });
+    };
+
+
+    process.once("SIGTERM", () => shutdown("SIGTERM"));
+    process.once("SIGINT", () => shutdown("SIGINT"));
+    } catch (error) {
+    console.error("Failed to start server:", error);
+    await disconnectDB().catch(() => {});
+    process.exit(1);
+  }
+  
+}
+startServer();
 
 //Handle unhandled promise rejection (e.g database connection errors)
-process.on("unhandledRejection", (err) => {
-    console.error("Unhandled Rejection:", err);
-    server.close(async () => {
-        await disconnectDB();
-        process.exit(1)
-    })
-})
+// process.on("unhandledRejection", (err) => {
+//     console.error("Unhandled Rejection:", err);
+//     server.close(async () => {
+//         await disconnectDB();
+//         process.exit(1)
+//     })
+// })
 
-//Handle uncaught exceptions
-process.on("uncaughtException", async (err) => {
-    console.error("Uncaught Exception", err)
-    await disconnectDB()
-    process.exit(1)
-})
+// //Handle uncaught exceptions
+// process.on("uncaughtException", async (err) => {
+//     console.error("Uncaught Exception", err)
+//     await disconnectDB()
+//     process.exit(1)
+// })
 
-//Graceful shutdown
-process.on("SIGTERM", async() => {
-    console.log("SIGTERM received, shutting down gracefully");
-    server.close(async() =>{
-        await disconnectDB()
-        process.exit(0)
-    })
+// //Graceful shutdown
+// process.on("SIGTERM", async() => {
+//     console.log("SIGTERM received, shutting down gracefully");
+//     server.close(async() =>{
+//         await disconnectDB()
+//         process.exit(0)
+//     })
     
-})
+
 
 //GET, POST, PUT, DELETE
 
