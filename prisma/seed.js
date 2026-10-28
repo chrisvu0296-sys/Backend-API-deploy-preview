@@ -11,7 +11,6 @@ const prisma  = new PrismaClient({
     adapter,
 })
 
-const userId ="d2088f32-80a7-4534-8042-8199bd423daf"
 
 const movies =[
     {

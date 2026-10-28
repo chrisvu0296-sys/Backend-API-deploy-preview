@@ -4,11 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "prisma generate",
     "seed:movie": "node prisma/seed.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/server.js"
   },
   "keywords": [],
   "author": "",
